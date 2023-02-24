@@ -1,7 +1,7 @@
 # LEVEL 1 🔵
 
 - [X] ulstr   
-- [ ] rot_13   
+- [X] rot_13   
 - [ ] rotone   
 - [ ] ft_swap   
 - [ ] fizzbuzz   
