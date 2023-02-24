@@ -1,6 +1,6 @@
 # LEVEL 1 🔵
 
-- [ ] ulstr   
+- [X] ulstr   
 - [ ] putstr   
 - [ ] rot_13   
 - [ ] rotone   
