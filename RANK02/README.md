@@ -1,11 +1,11 @@
 # LEVEL 1 🔵
 
 - [X] ulstr   
-- [ ] putstr   
 - [ ] rot_13   
 - [ ] rotone   
 - [ ] ft_swap   
 - [ ] fizzbuzz   
+- [X] ft_putstr   
 - [ ] ft_strcpy   
 - [ ] ft_strlen   
 - [ ] rev_print   
