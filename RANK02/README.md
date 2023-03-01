@@ -2,9 +2,9 @@
 
 - [X] ulstr   
 - [X] rot_13   
-- [ ] rotone   
-- [ ] ft_swap   
-- [ ] fizzbuzz   
+- [X] rotone   
+- [X] ft_swap   
+- [X] fizzbuzz   
 - [X] ft_putstr   
 - [ ] ft_strcpy   
 - [ ] ft_strlen   
