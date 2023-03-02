@@ -6,11 +6,11 @@
 - [X] ft_swap   
 - [X] fizzbuzz   
 - [X] ft_putstr   
-- [ ] ft_strcpy   
-- [ ] ft_strlen   
-- [ ] rev_print   
-- [ ] first_word   
-- [ ] repeat_alpha   
+- [X] ft_strcpy   
+- [X] ft_strlen   
+- [X] rev_print   
+- [X] first_word   
+- [X] repeat_alpha   
 - [ ] search_and_replace
 
 # LEVEL 2 🟢
