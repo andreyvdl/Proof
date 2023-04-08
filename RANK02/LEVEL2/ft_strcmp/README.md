@@ -1,10 +1,27 @@
-Assignment name  : ft_strcmp
-Expected files   : ft_strcmp.c
-Allowed functions:
---------------------------------------------------------------------------------
+# EN-US
 
-Reproduce the behavior of the function strcmp (man strcmp).
+> Assignment name  : ft_strcmp   
+> Expected files   : ft_strcmp.c   
+> Allowed functions:   
+> 
+> --------------------------------------------------------------------------------   
+> 
+> Reproduce the behavior of the function strcmp (man strcmp).   
+> 
+> Your function must be declared as follows:   
+> 
+> `int	ft_strcmp(char *s1, char *s2);`
 
-Your function must be declared as follows:
+# PT-BR
 
-int    ft_strcmp(char *s1, char *s2);
+> Assignment name  : ft_strcmp   
+> Expected files   : ft_strcmp.c   
+> Allowed functions:   
+> 
+> --------------------------------------------------------------------------------   
+> 
+> Reproduza o comportamento da função strcmp (man strcmp).   
+> 
+> Sua função deve ser declarada da seguinte forma:   
+> 
+> `int	ft_strcmp(char *s1, char *s2);`

@@ -11,7 +11,7 @@
 - [X] rev_print   
 - [X] first_word   
 - [X] repeat_alpha   
-- [ ] search_and_replace
+- [X] search_and_replace
 
 # LEVEL 2 🟢
 

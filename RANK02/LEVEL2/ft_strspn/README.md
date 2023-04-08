@@ -1,11 +1,28 @@
-Assignment name	: ft_strspn
-Expected files	: ft_strspn.c
-Allowed functions: None
----------------------------------------------------------------
+# EN-US
 
-Reproduce exactly the behavior of the strspn function 
-(man strspn).
+> Assignment name	: ft_strspn   
+> Expected files	: ft_strspn.c   
+> Allowed functions: None   
+> 
+> ---------------------------------------------------------------   
+> 
+> Reproduce exactly the behavior of the strspn function   
+> (man strspn).   
+> 
+> The function should be prototyped as follows:   
+> 
+> `size_t	ft_strspn(const char *s, const char *accept);`   
 
-The function should be prototyped as follows:
+# PT-BR
 
-size_t	ft_strspn(const char *s, const char *accept);
+> Assignment name	: ft_strspn   
+> Expected files	: ft_strspn.c   
+> Allowed functions: None   
+> 
+> ---------------------------------------------------------------   
+> 
+> Reproduza exatamente o comportamento da função strspn (man strspn).   
+> 
+> A função deve ser prototipada da seguinte forma:   
+> 
+> `size_t	ft_strspn(const char *s, const char *accept);`   
