@@ -15,13 +15,13 @@
 
 # LEVEL 2 🟢
 
-❌ max   
-❌ do_op   
-❌ inter   
-❌ union   
-❌ ft_atoi   
-❌ wdmatch   
-❌ swap_bits   
+⭕ max   
+⭕ do_op   
+⭕ inter   
+⭕ union   
+⭕ ft_atoi   
+⭕ wdmatch   
+⭕ swap_bits   
 ❌ ft_strcmp   
 ❌ ft_strdup   
 ❌ ft_strrev   

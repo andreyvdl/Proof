@@ -14,13 +14,7 @@
 > `unsigned char	swap_bits(unsigned char octet);`   
 > 
 > Example:   
-> 
->   1 byte   
-> \_____________   
->  0100 | 0001   
->      \\ /   
->      / \\   
->  0001 | 0100   
+> See the txt file   
 
 # PT-BR
 
@@ -38,10 +32,4 @@
 > `unsigned char	swap_bits(unsigned char octet);`   
 > 
 > Exemplo:   
-> 
->   1 byte   
-> \_____________   
->  0100 | 0001   
->      \\ /   
->      / \\   
->  0001 | 0100   
+> Veja o arquivo txt
