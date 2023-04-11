@@ -24,7 +24,7 @@
 ⭕ swap_bits   
 ⭕ ft_strcmp   
 ⭕ ft_strdup   
-❌ ft_strrev   
+⭕ ft_strrev   
 ❌ ft_strspn   
 ❌ last_word   
 ❌ ft_strcspn   
