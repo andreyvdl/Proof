@@ -22,8 +22,8 @@
 ⭕ ft_atoi   
 ⭕ wdmatch   
 ⭕ swap_bits   
-❌ ft_strcmp   
-❌ ft_strdup   
+⭕ ft_strcmp   
+⭕ ft_strdup   
 ❌ ft_strrev   
 ❌ ft_strspn   
 ❌ last_word   
