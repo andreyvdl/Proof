@@ -28,7 +28,7 @@
 ⭕ ft_strspn   
 ⭕ last_word   
 ⭕ ft_strcspn   
-❌ ft_strpbrk   
+⭕ ft_strpbrk   
 ❌ print_bits   
 ❌ alpha_mirror   
 ❌ reverse_bits   
