@@ -1,21 +1,11 @@
-#define NULL ((void *)0)
-
-static int	reach_int_min(void)
-{
-	int	number;
-
-	number = 0;
-	while (number < 1)
-		number--;
-	return (number + 1);
-}
+#include <limits.h>
 
 int	max(int *tab, unsigned int len)
 {
 	unsigned int	index;
 	int				biggest_number;
 
-	biggest_number = reach_int_min();
+	biggest_number = INT_MIN;
 	index = 0;
 	if (len == 0 || tab == NULL)
 		return (0);
