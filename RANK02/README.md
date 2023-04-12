@@ -29,7 +29,7 @@
 ⭕ last_word   
 ⭕ ft_strcspn   
 ⭕ ft_strpbrk   
-❌ print_bits   
+⭕ print_bits   
 ❌ alpha_mirror   
 ❌ reverse_bits   
 ❌ is_power_of_2   
