@@ -31,7 +31,7 @@
 ⭕ ft_strpbrk   
 ⭕ print_bits   
 ⭕ alpha_mirror   
-❌ reverse_bits   
+⭕ reverse_bits   
 ❌ is_power_of_2   
 ❌ camel_to_snake   
 ❌ snake_to_camel   
