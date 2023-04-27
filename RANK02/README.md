@@ -34,7 +34,7 @@
 ⭕ reverse_bits   
 ⭕ is_power_of_2   
 ⭕ camel_to_snake   
-❌ snake_to_camel   
+⭕ snake_to_camel   
 
 # LEVEL 3 🟡
 
