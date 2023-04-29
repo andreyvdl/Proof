@@ -40,7 +40,7 @@
 
 ⭕ lcm   
 ⭕ pgcd   
-❌ hidenp   
+⭕ hidenp   
 ❌ epur_str   
 ❌ ft_range   
 ❌ paramsum   
