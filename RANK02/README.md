@@ -39,7 +39,7 @@
 # LEVEL 3 🟡
 
 ⭕ lcm   
-❌ pgcd   
+⭕ pgcd   
 ❌ hidenp   
 ❌ epur_str   
 ❌ ft_range   
