@@ -38,7 +38,7 @@
 
 # LEVEL 3 🟡
 
-❌ lcm   
+⭕ lcm   
 ❌ pgcd   
 ❌ hidenp   
 ❌ epur_str   
