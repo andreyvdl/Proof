@@ -41,7 +41,7 @@
 ⭕ lcm   
 ⭕ pgcd   
 ⭕ hidenp   
-❌ epur_str   
+⭕ epur_str   
 ❌ ft_range   
 ❌ paramsum   
 ❌ tab_mult   
