@@ -42,7 +42,7 @@
 ⭕ pgcd   
 ⭕ hidenp   
 ⭕ epur_str   
-❌ ft_range   
+⭕ ft_range   
 ❌ paramsum   
 ❌ tab_mult   
 ❌ ft_rrange   
