@@ -39,7 +39,7 @@
 >
 > Exemplos:   
 >
-> - Com (1, 3) você deve retornar um array contendo 1, 2 and 3.   
-> - Com (-1, 2) você deve retornar um array contendo -1, 0, 1 and 2.   
+> - Com (1, 3) você deve retornar um array contendo 1, 2 e 3.   
+> - Com (-1, 2) você deve retornar um array contendo -1, 0, 1 e 2.   
 > - Com (0, 0) você deve retornar um array contendo 0.   
-> - Com (0, -3) você deve retornar um array contendo 0, -1, -2 and -3.   
+> - Com (0, -3) você deve retornar um array contendo 0, -1, -2 e -3.   

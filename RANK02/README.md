@@ -45,7 +45,7 @@
 ⭕ ft_range   
 ⭕ paramsum   
 ⭕ tab_mult   
-❌ ft_rrange   
+⭕ ft_rrange   
 ❌ print_hex   
 ❌ expand_str   
 ❌ ft_atoi_base   
