@@ -44,7 +44,7 @@
 ⭕ epur_str   
 ⭕ ft_range   
 ⭕ paramsum   
-❌ tab_mult   
+⭕ tab_mult   
 ❌ ft_rrange   
 ❌ print_hex   
 ❌ expand_str   
