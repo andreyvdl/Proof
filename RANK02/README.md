@@ -43,7 +43,7 @@
 ⭕ hidenp   
 ⭕ epur_str   
 ⭕ ft_range   
-❌ paramsum   
+⭕ paramsum   
 ❌ tab_mult   
 ❌ ft_rrange   
 ❌ print_hex   
