@@ -47,7 +47,7 @@
 ⭕ tab_mult   
 ⭕ ft_rrange   
 ⭕ print_hex   
-❌ expand_str   
+⭕ expand_str   
 ❌ ft_atoi_base   
 ❌ ft_list_size   
 ❌ add_prime_sum   
