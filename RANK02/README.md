@@ -50,7 +50,7 @@
 ⭕ expand_str   
 ⭕ ft_atoi_base   
 ⭕ ft_list_size   
-❌ add_prime_sum   
+⭕ add_prime_sum   
 ❌ str_capitalizer   
 ❌ rstr_capitalizer   
 
