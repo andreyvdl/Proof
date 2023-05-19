@@ -57,7 +57,7 @@
 # LEVEL 4 🔴
 
 ⭕ fprime   
-❌ ft_itoa   
+⭕ ft_itoa   
 ❌ ft_split   
 ❌ rev_wstr   
 ❌ rostring   
