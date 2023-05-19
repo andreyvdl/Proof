@@ -59,7 +59,7 @@
 ⭕ fprime   
 ⭕ ft_itoa   
 ⭕ ft_split   
-❌ rev_wstr   
+⭕ rev_wstr   
 ❌ rostring   
 ❌ sort_list   
 ❌ flood_fill   
