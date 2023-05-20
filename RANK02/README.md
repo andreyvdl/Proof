@@ -61,7 +61,7 @@
 ⭕ ft_split   
 ⭕ rev_wstr   
 ⭕ rostring   
-❌ sort_list   
+⭕ sort_list   
 ❌ flood_fill   
 ❌ sort_int_tab   
 ❌ ft_list_foreach   
