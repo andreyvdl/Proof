@@ -60,7 +60,7 @@
 ⭕ ft_itoa   
 ⭕ ft_split   
 ⭕ rev_wstr   
-❌ rostring   
+⭕ rostring   
 ❌ sort_list   
 ❌ flood_fill   
 ❌ sort_int_tab   
