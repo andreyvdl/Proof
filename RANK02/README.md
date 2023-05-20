@@ -65,4 +65,4 @@
 ⭕ flood_fill   
 ⭕ sort_int_tab   
 ⭕ ft_list_foreach   
-❌ ft_list_remove_if   
+⭕ ft_list_remove_if   
