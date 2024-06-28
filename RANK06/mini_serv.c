@@ -17,18 +17,18 @@ typedef struct
 } t_client;
 
 
-#define ARGS				"Wrong number of arguments\n"
-#define FATAL				"Fatal error\n"
-#define NEW					"server: client %d just arrived\n"
-#define MSG					"client %d: %s"
-#define BYE					"server: client %d just left\n"
 #define BUF_SIZE			4096
+#define FATAL				"Fatal error\n"
+#define MSG					"client %d: %s"
+#define ARGS				"Wrong number of arguments\n"
+#define BYE					"server: client %d just left\n"
+#define NEW					"server: client %d just arrived\n"
 #define PRINT_ERROR(str)	write(STDERR_FILENO, str, sizeof(str))
 
 
-int g_id = 0, g_fd = -1, g_ret = -1, g_max = 2;
 fd_set g_r;
 t_client g_client[FD_SETSIZE] = {0};
+int g_id = 0, g_fd = -1, g_ret = -1, g_max = 2;
 
 
 void loop(void);
