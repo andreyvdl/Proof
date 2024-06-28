@@ -4,8 +4,8 @@
 
 ```txt
 write, close, select, socket, accept, listen, send, recv, bind, strstr, strlen
-strcpy, strcat, memset, bzero, malloc, realloc, free, calloc, atoi, exit and
-sprintf
+strcpy, strcat, memset, bzero, malloc, realloc, free, calloc, atoi, exit,
+sprintf, htons and htonl
 ```
 
 ## DESCRIPTION/DESCRIÇÃO

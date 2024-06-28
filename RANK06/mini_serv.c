@@ -1,150 +1,183 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <sys/select.h>
+#include <string.h>
+#include <stdint.h>
+#include <strings.h>
+#include <arpa/inet.h>
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <string.h>
-#include <strings.h>
-#include <stdio.h>
-#include <stdint.h>
+#include <sys/select.h>
 #include <netinet/ip.h>
 
 typedef struct
 {
-	int			fd;
-	uint32_t	id;
+	int	fd;
+	int	id;
 } t_client;
 
-#define ARG_ERROR						"Wrong number of arguments\n"
-#define FATAL_ERROR						"Fatal error\n"
-#define NEW_CLIENT						"server: client %d just arrived\n"
-#define MSG_CLIENT						"client %d: %s"
-#define BYE_CLIENT						"server: client %d just left\n"
-#define BUFFER_SIZE						10000
-#define PRINT_ERROR(str)				write(STDERR_FILENO, str, sizeof(str))
-#define WRITE_TO_THEM(str, fd, size)	send(fd, str, size, 0)
 
-static void argError(int argc);
-static void	startSocket(void);
-static void bindSocket(uint16_t port);
-static void setQueue(void);
-static void waitForClients(void);
+#define ARGS				"Wrong number of arguments\n"
+#define FATAL				"Fatal error\n"
+#define NEW					"server: client %d just arrived\n"
+#define MSG					"client %d: %s"
+#define BYE					"server: client %d just left\n"
+#define BUF_SIZE			4096
+#define PRINT_ERROR(str)	write(STDERR_FILENO, str, sizeof(str))
 
-static int g_id = 0, sock_fd = -1;
-static fd_set readers, writers;
-static char	msg[BUFFER_SIZE] = {0};
-static t_client client[FD_SETSIZE] = {0};
+
+int g_id = 0, g_fd = -1, g_ret = -1, g_max = 2;
+fd_set g_r;
+t_client g_client[FD_SETSIZE] = {0};
+
+
+void loop(void);
+void getMsgs(void);
+
+
+static void closeAll(void)
+{
+	for (int i = 0; i < FD_SETSIZE; i++) {
+		if (g_client[i].fd > 0)
+			close(g_client[i].fd);
+	}
+	close(g_fd);
+}
+
+static void sendMsg(char* msg, size_t sz, int id)
+{
+	for (int i = 0; i < FD_SETSIZE; i++) {
+		if (g_client[i].fd > 0 && g_client[i].id != id)
+			send(g_client[i].fd, msg, sz, MSG_NOSIGNAL);
+	}
+}
+
+static void hello(int id)
+{
+	char msg[sizeof(NEW) + 2] = {0};
+
+	sprintf(msg, NEW, id);
+	sendMsg(msg, strlen(msg), id);
+}
+
+static void goodbye(int id)
+{
+	char msg[sizeof(BYE) + 2] = {0};
+
+	sprintf(msg, BYE, id);
+	sendMsg(msg, strlen(msg), id);
+}
 
 
 int main(int argc, char** argv)
 {
-	argError(argc);
-	startSocket();
-	bindSocket(atoi(argv[1]));
-	setQueue();
+	struct sockaddr_in sockaddr = {0};
 
+	if (argc < 2) {
+		PRINT_ERROR(ARGS);
+		exit(EXIT_FAILURE);
+	}
+
+	g_fd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
+	if (g_fd == -1) {
+		PRINT_ERROR(FATAL);
+		exit(EXIT_FAILURE);
+	}
+
+	sockaddr.sin_family = AF_INET;
+	sockaddr.sin_port = htons(atoi(argv[1]));
+	sockaddr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+	if (bind(g_fd, (struct sockaddr*)&sockaddr, sizeof(struct sockaddr_in)) == -1) {
+		PRINT_ERROR(FATAL);
+		close(g_fd);
+		exit(EXIT_FAILURE);
+	}
+
+	if (listen(g_fd, FD_SETSIZE) == -1) {
+		PRINT_ERROR(FATAL);
+		close(g_fd);
+		exit(EXIT_FAILURE);
+	}
+
+	loop();
 	return EXIT_SUCCESS;
 }
 
-
-// STARTING --------------------------------------------------------------------
-static void argError(int argc)
+void loop(void)
 {
-	if (argc < 2) {
-		PRINT_ERROR(ARG_ERROR);
-		exit(EXIT_FAILURE);
-	}
-}
-
-
-static void startSocket(void)
-{
-	sock_fd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
-	if (sock_fd == -1) {
-		PRINT_ERROR(FATAL_ERROR);
-		exit(EXIT_FAILURE);
-	}
-}
-
-
-static void bindSocket(uint16_t port)
-{
-	struct sockaddr_in sock_addr = {0};
-
-	port = (port << 8) | (port >> 8);
-	sock_addr.sin_family = AF_INET;
-	sock_addr.sin_port = port;
-	sock_addr.sin_addr.s_addr = INADDR_LOOPBACK;
-
-	if (bind(sock_fd, (struct sockaddr*)&sock_addr, sizeof(struct sockaddr_in))
-		== -1
-	) {
-		PRINT_ERROR(FATAL_ERROR);
-		close(sock_fd);
-		exit(EXIT_FAILURE);
-	}
-}
-
-
-static void setQueue(void)
-{
-	if (listen(sock_fd, FD_SETSIZE) == -1) {
-		PRINT_ERROR(FATAL_ERROR);
-		close(sock_fd);
-		exit(EXIT_FAILURE);
-	}
-}
-// -----------------------------------------------------------------------------
-
-
-// MAIN LOOP -------------------------------------------------------------------
-static void waitForClients(void)
-{
-	int		nfds = 0, ret = -1;
-
 	do {
-		FD_ZERO(&readers);
-		FD_ZERO(&writers);
-		nfds = addClientsToSet() + 1;
-		ret = select(nfds, &readers, &writers, 0, 0);
+		g_max = g_fd;
+		FD_ZERO(&g_r);
+		FD_SET(g_fd, &g_r);
+		for (int i = 0; i < FD_SETSIZE; i++) {
+			if (g_client[i].fd > 0) {
+				FD_SET(g_client[i].fd, &g_r);
+				if (g_client[i].fd > g_max)
+					g_max = g_client[i].fd;
+			}
+		}
 
-		if (ret == -1)
-			closeAndExit();
-		else if (ret)
-			listenAndRespond(nfds - 1);
+		g_ret = select(g_max + 1, &g_r, 0, 0, 0);
+
+		if (g_ret == -1) {
+			PRINT_ERROR(FATAL);
+			closeAll();
+			exit(EXIT_FAILURE);
+		}
+
+		if (FD_ISSET(g_fd, &g_r)) {
+			int new = accept(g_fd, 0, 0);
+
+			if (new == -1) {
+				PRINT_ERROR(FATAL);
+				closeAll();
+				exit(EXIT_FAILURE);
+			}
+			for (int i = 0; i < FD_SETSIZE; i++) {
+				if (g_client[i].fd < 1) {
+					g_client[i].fd = new;
+					g_client[i].id = g_id++;
+					hello(g_client[i].id);
+					break;
+				}
+			}
+		}
+
+		getMsgs();
 	} while (0 == -0);
 }
 
-
-static void listenAndRespond(int limit)
+void getMsgs(void)
 {
-	int i = 0;
+	char buf[BUF_SIZE] = {0};
 
-	if (FD_ISSET(sock_fd, &readers)) {
-		while (i < FD_SETSIZE && client[i].fd > 0)
-			++i;
-		if (i < FD_SETSIZE) {
-			client[i].fd = accept(sock_fd, 0, 0);
-			if (client[i].fd == -1)
-				closeAndExit();
-			client[i].id = id++;
-			welcomeToTheServer(client[i], sizeof(NEW_CLIENT) + 4);
+	for (int i = 0; i < FD_SETSIZE; i++) {
+		if (FD_ISSET(g_client[i].fd, &g_r)) {
+			g_ret = recv(g_client[i].fd, buf, BUF_SIZE, 0);
+
+			if (g_ret == -1) {
+				PRINT_ERROR(FATAL);
+				closeAll();
+				exit(EXIT_FAILURE);
+			}
+			else if (g_ret == 0) {
+				goodbye(g_client[i].id);
+				close(g_client[i].fd);
+				g_client[i].fd = -1;
+				continue;
+			}
+			size_t sz = strlen(buf);
+			char* msg = calloc(sizeof(MSG) + sz, sizeof(char));
+
+			if (msg == 0) {
+				PRINT_ERROR(FATAL);
+				closeAll();
+				exit(EXIT_FAILURE);
+			}
+			sprintf(msg, MSG, g_client[i].id, buf);
+			sendMsg(msg, strlen(msg), g_client[i].id);
+			free(msg);
+			bzero(buf, BUF_SIZE);
 		}
 	}
 }
-// -----------------------------------------------------------------------------
-
-
-// PRINTERS --------------------------------------------------------------------
-static void welcomeToTheServer(t_client c, size_t size)
-{
-	char* msg = calloc(size, sizeof(char));
-
-	if (msg == 0)
-		closeAndExit();
-	sprintf(msg, NEW_CLIENT, c.id);
-	for (int i = 0; i < FD_SETSIZE; i++) {
-		if ()
-	}
-}
-// -----------------------------------------------------------------------------
