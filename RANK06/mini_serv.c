@@ -2,206 +2,173 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
-#include <stdint.h>
-#include <strings.h>
-#include <arpa/inet.h>
-#include <sys/types.h>
-#include <sys/socket.h>
 #include <sys/select.h>
 #include <netinet/ip.h>
 
-typedef struct
-{
-	int	fd;
-	int	id;
+
+typedef struct s_c {
+	int fd;
+	unsigned int id;
+	char arr[FD_SETSIZE * FD_SETSIZE + 1];
 } t_client;
 
-
-fd_set g_r;
-t_client g_client[FD_SETSIZE] = {0};
-int g_id = 0, g_fd = -1, g_ret = -1, g_max = 2;
-const char* g_def[] = {
-	"Wrong number of arguments\n",
+unsigned int gid = 0;
+int gmax = 0, gfd = -1, gret = -1;
+char gbuf[FD_SETSIZE * 8 + 1] = {0};
+char* gtext[] = {
+	"Wrong numbr of arguments\n",
 	"Fatal error\n",
 	"server: client %d just arrived\n",
-	"server: client %d just left\n",
 	"client %d: %s\n",
-	"client %d: \n"
+	"server: client %d just left\n",
 };
+t_client client[FD_SETSIZE] = {0};
 
 
-void loop(void);
-void getMsgs(void);
-void formatMsg(char* buf, char* msg, int id);
-
+static void giveErro(char* str, size_t sz)
+{
+	write(STDERR_FILENO, str, sz);
+	exit(EXIT_FAILURE);
+}
 
 static void closeAll(void)
 {
-	for (int i = 0; i < FD_SETSIZE; i++) {
-		if (g_client[i].fd > 0)
-			close(g_client[i].fd);
-	}
-	close(g_fd);
+	for (int i = 0; i < FD_SETSIZE; i++)
+		if (client[i].fd > 0) close(client[i].fd);
+	close(gfd);
 }
 
-static void sendMsg(char* msg, size_t sz, int id)
+static void serverMsg(char* msg, unsigned int id)
 {
-	for (int i = 0; i < FD_SETSIZE; i++) {
-		if (g_client[i].fd > 0 && g_client[i].id != id)
-			send(g_client[i].fd, msg, sz, MSG_NOSIGNAL);
-	}
+	char text[32 + 4] = {0};
+	size_t sz = 0;
+
+	sprintf(text, msg, id);
+	sz = strlen(text);
+	for (int i = 0; i < FD_SETSIZE; i++)
+		if (client[i].fd > 0 && client[i].id != id) send(client[i].fd, text, sz, MSG_NOSIGNAL);
 }
 
-static void enterAndExit(int id, int pos)
+static void sendMsg(char* msg, size_t sz, unsigned int id)
 {
-	char msg[33] = {0};
-
-	sprintf(msg, g_def[pos], id);
-	sendMsg(msg, strlen(msg), id);
+	for (int i = 0; i < FD_SETSIZE; i++)
+		if (client[i].fd > 0 && client[i].id != id) send(client[i].fd, msg, sz, MSG_NOSIGNAL);
 }
+
+
+void startSock(char* str_port);
+void startLoop(void);
+void readMsg(t_client* c);
+void editSend(t_client* c);
 
 
 int main(int argc, char** argv)
 {
-	struct sockaddr_in sockaddr = {0};
+	if (argc < 2) giveErro( gtext[0], strlen(gtext[0]) );
 
-	if (argc < 2) {
-		write(STDERR_FILENO, g_def[0], strlen(g_def[0]));
-		exit(EXIT_FAILURE);
-	}
-
-	g_fd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
-	if (g_fd == -1) {
-		write(STDERR_FILENO, g_def[1], strlen(g_def[1]));
-		exit(EXIT_FAILURE);
-	}
-
-	sockaddr.sin_family = AF_INET;
-	sockaddr.sin_port = htons(atoi(argv[1]));
-	sockaddr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
-	if (bind(g_fd, (struct sockaddr*)&sockaddr, sizeof(struct sockaddr_in)) == -1) {
-		write(STDERR_FILENO, g_def[1], strlen(g_def[1]));
-		close(g_fd);
-		exit(EXIT_FAILURE);
-	}
-
-	if (listen(g_fd, FD_SETSIZE) == -1) {
-		write(STDERR_FILENO, g_def[1], strlen(g_def[1]));
-		close(g_fd);
-		exit(EXIT_FAILURE);
-	}
-
-	loop();
-	return EXIT_SUCCESS;
+	startSock(argv[1]);
+	startLoop();
 }
 
-void loop(void)
+void startSock(char* str_port)
 {
+	gfd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
+	if (gfd == -1) giveErro( gtext[1], strlen(gtext[1]) );
+
+	struct sockaddr_in sock;
+
+	sock.sin_family = AF_INET;
+	sock.sin_port = htons( atoi(str_port) );
+	sock.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+
+	if (bind( gfd, (struct sockaddr*)&sock, sizeof(struct sockaddr_in) ) == -1) {
+		close(gfd);
+		giveErro( gtext[1], strlen(gtext[1]) );
+	}
+
+	if (listen(gfd, FD_SETSIZE) == -1) {
+		close(gfd);
+		giveErro( gtext[1], strlen(gtext[1]) );
+	}
+}
+
+void startLoop(void)
+{
+	fd_set read;
+
 	do {
-		g_max = g_fd;
-		FD_ZERO(&g_r);
-		FD_SET(g_fd, &g_r);
+		gmax = gfd;
+		FD_ZERO(&read);
+		FD_SET(gfd, &read);
 		for (int i = 0; i < FD_SETSIZE; i++) {
-			if (g_client[i].fd > 0) {
-				FD_SET(g_client[i].fd, &g_r);
-				if (g_client[i].fd > g_max)
-					g_max = g_client[i].fd;
+			if (client[i].fd > 0) {
+				FD_SET(client[i].fd, &read);
+				if (gmax < client[i].fd) gmax = client[i].fd;
 			}
 		}
 
-		g_ret = select(g_max + 1, &g_r, 0, 0, 0);
-// Apartir daqui tudo só aceita conexão e responde, então śo alocação resulta em
-// Fatal error
+		gret = select(gmax + 1, &read, 0, 0, 0);
 
-		if (g_ret == -1)
-			continue;
+		if (gret == -1) continue;
 
-		if (FD_ISSET(g_fd, &g_r)) {
-			int new = accept(g_fd, 0, 0);
+		if (FD_ISSET(gfd, &read)) {
+			int fd = -1, i = 0;
 
-			if (new == -1)
-				continue;
-			for (int i = 0; i < FD_SETSIZE; i++) {
-				if (g_client[i].fd < 1) {
-					g_client[i].fd = new;
-					g_client[i].id = g_id++;
-					enterAndExit(g_client[i].id, 2);
+			fd = accept(gfd, 0, 0);
+			if (fd < 0) continue;
+
+			for (i = 0; i < FD_SETSIZE; i++) {
+				if (client[i].fd < 1) {
+					client[i].fd = fd;
+					client[i].id = gid++;
+					serverMsg(gtext[2], client[i].id);
 					break;
 				}
 			}
+			if (i == FD_SETSIZE) close(fd);
 		}
 
-		getMsgs();
-	} while (0 == -0);
+		for (int i = 0; i < FD_SETSIZE; i++)
+			if (FD_ISSET(client[i].fd, &read)) readMsg(&client[i]);
+	} while ("feito por adantas-");
 }
 
-void getMsgs(void)
+void readMsg(t_client* c)
 {
-	char buf[4096] = {0};
+	char* rabaeni = 0;
 
-	for (int i = 0; i < FD_SETSIZE; i++) {
-		if (FD_ISSET(g_client[i].fd, &g_r)) {
-			g_ret = recv(g_client[i].fd, buf, 4096, 0);
+	gret = recv(c->fd, gbuf, FD_SETSIZE * 8, 0);
 
-			if (g_ret == -1)
-				continue;
-			else if (g_ret == 0) {
-				enterAndExit(g_client[i].id, 3);
-				close(g_client[i].fd);
-				g_client[i].fd = -1;
-				continue;
-			}
-
-			char* msg = calloc(g_ret + 15, sizeof(char));
-// O tamanho na verdade é 12, mas é bom deixar esses 3 extras
-
-			if (msg == 0) {
-				write(STDERR_FILENO, g_def[1], strlen(g_def[1]));
-				closeAll();
-				exit(EXIT_FAILURE);
-			}
-
-			formatMsg(buf, msg, g_client[i].id);
-// Infelizmente a mensagem pode ter mais de 1 \n e se tiver cada linha tem q ter
-// client %d: %s
-			free(msg);
-			bzero(buf, 4096);
-		}
+	if (gret < 1) {
+		serverMsg(gtext[4], c->id);
+		close(c->fd);
+		c->fd = -1;
+		return;
 	}
+	gbuf[gret] = 0;
+
+	strcat(c->arr, gbuf);
+	rabaeni = strstr(gbuf, "\n");
+	if (rabaeni != 0) editSend(c);
 }
 
-void formatMsg(char* buf, char* msg, int id)
+void editSend(t_client* c)
 {
-	char* find = 0;
-	char tmp[4096];
-	size_t sz;
+	char* rabaeni = 0;
+	char* text = 0;
 
-	if (*buf == 0) {
-		sprintf(msg, g_def[5], id);
-		sendMsg(msg, strlen(msg), id);
-		return;
+	rabaeni = strstr(c->arr, "\n");
+	text = calloc( strlen(c->arr) + 12 + 4, sizeof(char) );
+	if (text == 0) {
+		closeAll();
+		giveErro( gtext[1], strlen(gtext[1]) );
 	}
-
-	find = strstr(buf, "\n");
-	if (find == 0) {
-		sprintf(msg, g_def[4], id, buf);
-		sendMsg(msg, strlen(msg), id);
-		return;
+	while (rabaeni != 0) {
+		*rabaeni = 0;
+		sprintf(text, gtext[3], c->id, c->arr);
+		sendMsg(text, strlen(text), c->id);
+		strcpy(c->arr, rabaeni + 1);
+		rabaeni = strstr(c->arr, "\n");
 	}
-
-	do {
-		*find = 0;
-		strcpy(tmp, buf);
-		buf = find + 1;
-		sprintf(msg, g_def[4], id, tmp);
-		sz = strlen(msg);
-		sendMsg(msg, sz, id);
-		bzero(msg, sz);
-		find = strstr(buf, "\n");
-	} while (find != 0);
-
-	if (strlen(buf) != 0) {
-		sprintf(msg, g_def[4], id, buf);
-		sendMsg(msg, strlen(msg), id);
-	}
+	free(text);
 }
