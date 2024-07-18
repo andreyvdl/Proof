@@ -145,8 +145,6 @@ void startLoop(void)
 
 void readMsg(t_client* c)
 {
-	char* rabaeni = 0;
-
 	gret = recv(c->fd, gbuf, FD_SETSIZE * 8, 0);
 
 	if (gret < 1) {
@@ -159,8 +157,7 @@ void readMsg(t_client* c)
 	gbuf[gret] = 0;
 
 	strcat(c->arr, gbuf);
-	rabaeni = strstr(gbuf, "\n");
-	if (rabaeni != 0) editSend(c);
+	if (strstr(gbuf, "\n") != 0) editSend(c);
 }
 
 void editSend(t_client* c)
