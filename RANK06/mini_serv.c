@@ -9,7 +9,7 @@
 typedef struct s_c {
 	int fd;
 	unsigned int id;
-	char arr[FD_SETSIZE * FD_SETSIZE + 1];
+	char* arr;
 } t_client;
 
 unsigned int gid = 0;
@@ -33,8 +33,10 @@ static void giveErro(char* str, size_t sz)
 
 static void closeAll(void)
 {
-	for (int i = 0; i < FD_SETSIZE; i++)
+	for (int i = 0; i < FD_SETSIZE; i++) {
 		if (client[i].fd > 0) close(client[i].fd);
+		free(client[i].arr);
+	}
 	close(gfd);
 }
 
@@ -89,6 +91,14 @@ void startSock(char* str_port)
 	if (listen(gfd, FD_SETSIZE) == -1) {
 		close(gfd);
 		giveErro( gtext[1], strlen(gtext[1]) );
+	}
+	for (int i = 0; i < FD_SETSIZE; i++) {
+		client[i].arr = calloc(FD_SETSIZE * FD_SETSIZE + 1, sizeof(char));
+		if (client[i].arr == 0) {
+			for (int j = 0; j < i; j++) free(client[j].arr);
+			close(gfd);
+			giveErro( gtext[1], strlen(gtext[1]) );
+		}
 	}
 }
 
@@ -154,21 +164,27 @@ void readMsg(t_client* c)
 
 void editSend(t_client* c)
 {
-	char* rabaeni = 0;
+	char* rabaeni[2] = {0};
 	char* text = 0;
 
-	rabaeni = strstr(c->arr, "\n");
 	text = calloc( strlen(c->arr) + 12 + 4, sizeof(char) );
 	if (text == 0) {
 		closeAll();
 		giveErro( gtext[1], strlen(gtext[1]) );
 	}
-	while (rabaeni != 0) {
-		*rabaeni = 0;
-		sprintf(text, gtext[3], c->id, c->arr);
+	*rabaeni = strstr(c->arr, "\n");
+	// if (*rabaeni == 0) {
+	// 	sprintf(text, gtext[3], c->id, c->arr);
+	// 	sendMsg(text, strlen(text), c->id);
+	// }
+	rabaeni[1] = c->arr;
+	while (*rabaeni != 0) {
+		**rabaeni = 0;
+		sprintf(text, gtext[3], c->id, rabaeni[1]);
 		sendMsg(text, strlen(text), c->id);
-		strcpy(c->arr, rabaeni + 1);
-		rabaeni = strstr(c->arr, "\n");
+		rabaeni[1] = (*rabaeni) + 1;
+		*rabaeni = strstr(rabaeni[1], "\n");
 	}
+	bzero(c->arr, FD_SETSIZE * FD_SETSIZE + 1);
 	free(text);
 }
