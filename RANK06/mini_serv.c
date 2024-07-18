@@ -153,6 +153,7 @@ void readMsg(t_client* c)
 		serverMsg(gtext[4], c->id);
 		close(c->fd);
 		c->fd = -1;
+		bzero(c->arr, FD_SETSIZE * FD_SETSIZE + 1);
 		return;
 	}
 	gbuf[gret] = 0;
@@ -173,10 +174,6 @@ void editSend(t_client* c)
 		giveErro( gtext[1], strlen(gtext[1]) );
 	}
 	*rabaeni = strstr(c->arr, "\n");
-	// if (*rabaeni == 0) {
-	// 	sprintf(text, gtext[3], c->id, c->arr);
-	// 	sendMsg(text, strlen(text), c->id);
-	// }
 	rabaeni[1] = c->arr;
 	while (*rabaeni != 0) {
 		**rabaeni = 0;
