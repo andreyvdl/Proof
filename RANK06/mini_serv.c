@@ -179,6 +179,11 @@ void editSend(t_client* c)
 		rabaeni[1] = (*rabaeni) + 1;
 		*rabaeni = strstr(rabaeni[1], "\n");
 	}
-	bzero(c->arr, FD_SETSIZE * FD_SETSIZE + 1);
+	if (rabaeni[1][0] != 0) {
+		strcpy(text, rabaeni[1]);
+		bzero(c->arr, FD_SETSIZE * FD_SETSIZE + 1);
+		strcpy(c->arr, text);
+	}
+	else bzero(c->arr, FD_SETSIZE * FD_SETSIZE + 1);
 	free(text);
 }
